@@ -1,5 +1,6 @@
 user = ""
 current_listing = ""
+bubbles = []
 
 rpc = (method, params, good) ->
   $.ajax
