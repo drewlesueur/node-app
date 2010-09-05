@@ -4,6 +4,8 @@ html
     script(src="http://maps.google.com/maps/api/js?sensor=false")
     script(src="/js/jquery.js")
     script(src="/js/jqueryui.js")
+    script(src="/js/underscore.js")
+    script(src="/js/util.js")    
     script(src="/coffee/officelist.js")
     link(type="text/css", rel="stylesheet", href="/css/style.css")
   body
@@ -18,7 +20,7 @@ html
                 span#jingle the free way to search for real estate
               td(align="right")
                 - if (username)
-                  span Logged in as 
+                  span(id: "user", data-officelist-user: "#{req.officelistUser()}") Logged in as 
                     a(href : "http://twitter.com/" + username) #{username}
                     span |
                     a(href : "/logout") Logout                  
@@ -44,7 +46,7 @@ html
                 option NNN
               br
               h5 Description
-              textarea
+              textarea#description(name="description")
               br
               select#built(name="built")
                 option Built-out
@@ -52,6 +54,32 @@ html
 
               br
               input(type="submit", value="Add")
+          h3.edit_listing Edit Listing
+          div.edit_listing
+            form#edit_form(method="POST", action="/")
+              select#option(name="type")
+                option For Lease
+              h5 Location
+              input(name="location")
+              h5 Size
+              input(name="size")
+              
+              h5 Price
+              input(name="price")
+              select(name="price_type")
+                option Per Month
+              select(name="nnn")
+                option NNN
+              br
+              h5 Description
+              textarea(name="description")
+              br
+              select(name="built")
+                option Built-out
+                option Shell
+
+              br
+              input(type="submit", value="Edit")
           h3.search_listings Search
           div.search_listings
             form

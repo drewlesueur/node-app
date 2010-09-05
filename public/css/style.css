@@ -16,12 +16,16 @@ td.main {
 }
 
 
-.add_listing, .search_listings {
+.add_listing, .search_listings, .edit_listing {
   padding-left: 10px;
 }
 
 .add_listing {
   background-color: lightgreen;
+}
+
+.edit_listing {
+  background-color: burlywood;
 }
 
 .search_listings {

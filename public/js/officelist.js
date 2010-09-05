@@ -1,5 +1,7 @@
 (function() {
-  var add_google_map_marker, map, markers, remove_markers, rpc;
+  var add_google_map_marker, add_search_result, current_listing, map, markers, remove_markers, rpc, user;
+  user = "";
+  current_listing = "";
   rpc = function(method, params, good) {
     return $.ajax({
       type: "POST",
@@ -44,8 +46,46 @@
       }
     });
   };
+  add_search_result = function(listing) {
+    var marker;
+    marker = new google.maps.Marker({
+      position: new google.maps.LatLng(listing.lat, listing.lng),
+      map: map
+    });
+    if (marker.user === user) {
+      marker.setDraggable(true);
+    }
+    return google.maps.event.addListener(marker, "click", function() {
+      var bubble;
+      bubble = new google.maps.InfoWindow({
+        content: ("\
+      [image]\
+      <br>\
+      <h3>" + (listing.location) + "</h3>\
+      <div>\
+      " + (listing.description || "") + "\
+      </div>\
+      ")
+      });
+      bubble.open(map, marker);
+      if (marker.user === user) {
+        $("h3.edit_listing").click();
+        $(".edit_listing [name='location']").val(listing.location);
+        $(".edit_listing [name='size']").val(listing.size);
+        $(".edit_listing [name='price']").val(listing.price);
+        $(".edit_listing [name='price_type']").val(listing.price_type);
+        $(".edit_listing [name='price_type']").val(listing.price_type);
+        $(".edit_listing [name='nnn']").val(listing.nnn);
+        $(".edit_listing [name='description']").val(listing.description);
+        $(".edit_listing [name='built']").val(listing.built);
+        current_listing = listing.id;
+        return (markers = [marker]);
+      }
+    });
+  };
   $(document).ready(function() {
     var initialize, the_height;
+    user = $("#user").attr("data-officelist-user");
     initialize = function() {
       var latlng, myOptions;
       latlng = new google.maps.LatLng(33.4222685, -111.8226402);
@@ -54,7 +94,12 @@
         center: latlng,
         mapTypeId: google.maps.MapTypeId.ROADMAP
       };
-      return (map = new google.maps.Map(document.getElementById("map"), myOptions));
+      map = new google.maps.Map(document.getElementById("map"), myOptions);
+      return rpc("get_all_listings", {}, function(data) {
+        return _.each(data, function(listing) {
+          return add_search_result(listing);
+        });
+      });
     };
     initialize();
     $('#main_table').css({
@@ -70,7 +115,7 @@
     $("#location").change(function(e) {
       return add_google_map_marker($(this).val());
     });
-    return $("#add_form").submit(function(e) {
+    $("#add_form").submit(function(e) {
       var data, lat, lat_lng, lng;
       try {
         data = $("#add_form").serializeArray();
@@ -90,6 +135,35 @@
         });
         rpc("add_listing", data, function() {
           return alert("listing added");
+        });
+        e.preventDefault();
+        return false;
+      } catch (e) {
+        alert(e);
+        return false;
+      }
+    });
+    return $("#edit_form").submit(function(e) {
+      var data, lat, lat_lng, lng;
+      try {
+        data = $("#edit_form").serializeArray();
+        lat_lng = markers[0].getPosition();
+        lat = lat_lng.lat();
+        lng = lat_lng.lng();
+        data.push({
+          name: "lat",
+          value: lat
+        });
+        data.push({
+          name: "lng",
+          value: lng
+        });
+        data.push({
+          name: "id",
+          value: current_listing
+        });
+        rpc("edit_listing", data, function() {
+          return alert("listing edited");
         });
         e.preventDefault();
         return false;

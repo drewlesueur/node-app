@@ -1,3 +1,6 @@
+user = ""
+current_listing = ""
+
 rpc = (method, params, good) ->
   $.ajax
     type: "POST"
@@ -29,9 +32,40 @@ add_google_map_marker = (wherethe) ->
     else
       alert "Geocode was not successful for the following reason: " + status
  
-  
+add_search_result = (listing) ->
+  marker = new google.maps.Marker
+    position: new google.maps.LatLng listing.lat, listing.lng
+    map: map
+  if marker.user is user
+    marker.setDraggable true
+  google.maps.event.addListener marker, "click", () ->
+    bubble = new google.maps.InfoWindow
+      content: "
+      [image]
+      <br>
+      <h3>#{listing.location}</h3>
+      <div>
+      #{listing.description or ""}
+      </div>
+      "
+    bubble.open map, marker
+    if marker.user is user
+      $("h3.edit_listing").click()
+      $(".edit_listing [name='location']").val(listing.location)
+      $(".edit_listing [name='size']").val(listing.size)
+      $(".edit_listing [name='price']").val(listing.price)
+      $(".edit_listing [name='price_type']").val(listing.price_type)
+      $(".edit_listing [name='price_type']").val(listing.price_type)
+      $(".edit_listing [name='nnn']").val(listing.nnn)
+      $(".edit_listing [name='description']").val(listing.description)
+      $(".edit_listing [name='built']").val(listing.built)
+      current_listing = listing.id
+      markers = [marker]
+
+      
 
 $(document).ready () ->
+  user = $("#user").attr "data-officelist-user"
   initialize = () ->
     latlng = new google.maps.LatLng(33.4222685, -111.8226402)
     myOptions = {
@@ -40,6 +74,11 @@ $(document).ready () ->
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
     map = new google.maps.Map(document.getElementById("map"),myOptions)
+    
+    rpc "get_all_listings", {},(data) ->
+      _.each data, (listing) ->
+        add_search_result listing
+    
   initialize()
   
   #make th table the right height
@@ -70,6 +109,23 @@ $(document).ready () ->
       data.push name: "lng", value: lng
       rpc "add_listing", data, () ->
         alert "listing added"
+      e.preventDefault()
+      return false
+    catch e
+      alert e
+      return false
+      
+  $("#edit_form").submit (e) ->
+    try
+      data = $("#edit_form").serializeArray()
+      lat_lng = markers[0].getPosition()
+      lat = lat_lng.lat()
+      lng = lat_lng.lng()
+      data.push name: "lat", value: lat
+      data.push name: "lng", value: lng
+      data.push name: "id", value: current_listing
+      rpc "edit_listing", data, () ->
+        alert "listing edited"
       e.preventDefault()
       return false
     catch e

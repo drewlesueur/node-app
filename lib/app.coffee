@@ -56,10 +56,14 @@ app.get "/", (req, res) ->
     
     res.render 'home2.jade', layout: false, locals:
       username: req.getAuthDetails().user.username
+      req: req
+      res: res
   else
     # console.log "having a what?: " + req.party
     res.render 'home2.jade', layout: false, locals:
       username: ""
+      req: req
+      res: res
 
 app.post "/methods/:method", (req, res) ->
   methods[req.param("method")] req, res
