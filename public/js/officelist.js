@@ -1,5 +1,16 @@
 (function() {
-  var add_google_map_marker, map, markers, remove_markers;
+  var add_google_map_marker, map, markers, remove_markers, rpc;
+  rpc = function(method, params, good) {
+    return $.ajax({
+      type: "POST",
+      url: "/methods/" + method,
+      data: params,
+      success: good,
+      error: function() {
+        return alert("oops");
+      }
+    });
+  };
   map = "";
   markers = [];
   remove_markers = function() {
@@ -50,16 +61,42 @@
       height: $(window).height() + "px"
     });
     the_height = $("#map").parent().height() + "px";
-    console.log(the_height);
     $("#map").css({
       height: the_height
     });
     $("#left_side").accordion({
       autoHeight: false
     });
-    return $("#location").change(function(e) {
-      console.log("location change");
+    $("#location").change(function(e) {
       return add_google_map_marker($(this).val());
+    });
+    return $("#add_form").submit(function(e) {
+      var data, lat, lat_lng, lng;
+      try {
+        data = $("#add_form").serializeArray();
+        if (markers.length === 0) {
+          $("#location").change();
+        }
+        lat_lng = markers[0].getPosition();
+        lat = lat_lng.lat();
+        lng = lat_lng.lng();
+        data.push({
+          name: "lat",
+          value: lat
+        });
+        data.push({
+          name: "lng",
+          value: lng
+        });
+        rpc("add_listing", data, function() {
+          return alert("listing added");
+        });
+        e.preventDefault();
+        return false;
+      } catch (e) {
+        alert(e);
+        return false;
+      }
     });
   });
 })();

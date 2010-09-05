@@ -6,10 +6,14 @@ client.password = 'k'
 client.connect()
 client.query('USE officelist');
 
+this.client = client
+
 Auth = require "auth"
 fs = require "fs"
 require ("./underscore")
 require("./util")
+require("./util2.coffee")
+require("./methods")
 
 
 #for twitter
@@ -28,10 +32,9 @@ MyTest = (req, res, next) ->
   if not req.session.officelist
     req.session.officelist = {}
 
-  # log in on local so you don't have to log in
-  if _(req.headers.host).startsWith "local"
-    req.session.officelist.userdomain = "officelist"
-    req.session.officelist.userid = "local"
+  req.officelistUser = () ->
+    return req.session.officelist.userdomain + ":" + req.session.officelist.userid
+
   next()
 
 
@@ -54,11 +57,11 @@ app.get "/", (req, res) ->
     res.render 'home2.jade', layout: false, locals:
       username: req.getAuthDetails().user.username
   else
-    console.log "having a what?: " + req.party
+    # console.log "having a what?: " + req.party
     res.render 'home2.jade', layout: false, locals:
       username: ""
 
-app.post "methods/:method", (req, res) ->
+app.post "/methods/:method", (req, res) ->
   methods[req.param("method")] req, res
 
 
@@ -78,15 +81,16 @@ app.get '/auth/twitter/callback', (req, res, params) ->
         req.session.officelist.userid = req.getAuthDetails().user.userid
       else if authentication_strategy is "anon"
         req.session.officelist.userid = req.getAuthDetails().user.username
-      console.log "user login " +  JSON.stringify req.getAuthDetails()
-      console.log req.session.access_token
+      # console.log "user login " +  JSON.stringify req.getAuthDetails()
+      # console.log req.session.access_token
       res.redirect "/"
     else
       res.redirect "/"
 
 app.get '/coffee/:name.js', (req, res) ->
   exec "coffee -c public/js/" + req.params.name + '.coffee', (error, stdout, stderr) ->
-    console.log(error)
+    if error
+      console.log(error)
     fs.chmod 'public/js/' + req.params.name + '.js', parseInt("777", 8), () ->
       res.sendfile('public/js/' + req.params.name + '.js')
 

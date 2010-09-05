@@ -1,3 +1,11 @@
+rpc = (method, params, good) ->
+  $.ajax
+    type: "POST"
+    url: "/methods/" + method
+    data: params
+    success: good
+    error: () -> alert "oops"
+
 map = ""
 markers = []  
 
@@ -39,7 +47,7 @@ $(document).ready () ->
     height: $(window).height() + "px"
   
   the_height = $("#map").parent().height() + "px"
-  console.log the_height
+  
   
   # make the map the right height
   $("#map").css
@@ -48,12 +56,34 @@ $(document).ready () ->
   $("#left_side").accordion autoHeight: false
     
   $("#location").change (e) ->
-    console.log "location change"
     add_google_map_marker $(this).val()
     
+  $("#add_form").submit (e) ->
+    try
+      data = $("#add_form").serializeArray()
+      if markers.length is 0
+        $("#location").change()
+      lat_lng = markers[0].getPosition()
+      lat = lat_lng.lat()
+      lng = lat_lng.lng()
+      data.push name: "lat", value: lat
+      data.push name: "lng", value: lng
+      rpc "add_listing", data, () ->
+        alert "listing added"
+      e.preventDefault()
+      return false
+    catch e
+      alert e
+      return false
+        
+          
+        
+        
     
+      
+      
+      
+      
     
+   
     
-  
- 
-  
