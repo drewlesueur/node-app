@@ -1,14 +1,23 @@
 map = ""
-  
-add_google_map_marker = (where) ->
+markers = []  
+
+remove_markers = () ->
+  for i in markers
+    i.setMap null
+    
+add_google_map_marker = (wherethe) ->
+  remove_markers()
   geocoder = new google.maps.Geocoder()
-  geocoder.geocode address: where, (results, status) ->
+  geocoder.geocode address: wherethe, (results, status) ->
     if status is google.maps.GeocoderStatus.OK
-      map.setCenter resutls[0].geometry.location
-        marker = new google.maps.Marker
-          position: results[0].geometry.location
-          map: map
-          title: "hello world"
+      map.setCenter results[0].geometry.location
+      marker = new google.maps.Marker
+        position: results[0].geometry.location
+        map: map
+        title: "hello world"
+        draggable: true
+      markers.push marker
+
     else
       alert "Geocode was not successful for the following reason: " + status
  
