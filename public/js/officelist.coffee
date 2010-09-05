@@ -107,8 +107,16 @@ $(document).ready () ->
       lng = lat_lng.lng()
       data.push name: "lat", value: lat
       data.push name: "lng", value: lng
-      rpc "add_listing", data, () ->
+      rpc "add_listing", data, (ret) ->
         alert "listing added"
+        listing = {}
+        _.each data, (item) ->
+          listing[item.name] = item.value
+        listing.id = ret.result.insertId
+        listing.user = user
+        add_search_result listing
+        remove_markers() #remove the adding markers
+        console.log "added", listing
       e.preventDefault()
       return false
     catch e

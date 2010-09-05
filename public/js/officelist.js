@@ -133,8 +133,18 @@
           name: "lng",
           value: lng
         });
-        rpc("add_listing", data, function() {
-          return alert("listing added");
+        rpc("add_listing", data, function(ret) {
+          var listing;
+          alert("listing added");
+          listing = {};
+          _.each(data, function(item) {
+            return (listing[item.name] = item.value);
+          });
+          listing.id = ret.result.insertId;
+          listing.user = user;
+          add_search_result(listing);
+          remove_markers();
+          return console.log("added", listing);
         });
         e.preventDefault();
         return false;
