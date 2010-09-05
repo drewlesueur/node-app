@@ -1,8 +1,10 @@
+require "./secret.coffee"
+
 Client = require('mysql').Client
 client = new Client()
-client.user = 'root'
+client.user = data_config.user
 # client.host = '127.0.0.1'
-client.password = 'k'
+client.password = data_config.password
 client.connect()
 client.query('USE officelist');
 
@@ -16,10 +18,7 @@ require("./util2.coffee")
 require("./methods")
 
 
-#for twitter
-config =
-  consumerKey: ""
-  consumerSecret: ""
+
 
 
 express = require("express")
@@ -48,7 +47,7 @@ app.configure () ->
   app.use(express.bodyDecoder())
   app.use(express.cookieDecoder())
   app.use(express.session({ lifetime: (150).seconds, reapInterval: (10).seconds }))
-  app.use(Auth([ Auth.Anonymous(), Auth.Never(), Auth.Twitter(config) ]))
+  app.use(Auth([ Auth.Anonymous(), Auth.Never(), Auth.Twitter(twitter_config) ]))
   app.use MyTest
 
 app.get "/", (req, res) ->

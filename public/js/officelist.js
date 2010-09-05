@@ -52,7 +52,7 @@
       position: new google.maps.LatLng(listing.lat, listing.lng),
       map: map
     });
-    if (marker.user === user) {
+    if (listing.user === user) {
       marker.setDraggable(true);
     }
     return google.maps.event.addListener(marker, "click", function() {
@@ -68,7 +68,7 @@
       ")
       });
       bubble.open(map, marker);
-      if (marker.user === user) {
+      if (listing.user === user) {
         $("h3.edit_listing").click();
         $(".edit_listing [name='location']").val(listing.location);
         $(".edit_listing [name='size']").val(listing.size);

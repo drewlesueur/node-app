@@ -20,7 +20,7 @@ html
                 span#jingle the free way to search for real estate
               td(align="right")
                 - if (username)
-                  span(id: "user", data-officelist-user: "#{req.officelistUser()}") Logged in as 
+                  span(id: "user", data-officelist-user: req.officelistUser()) Logged in as 
                     a(href : "http://twitter.com/" + username) #{username}
                     span |
                     a(href : "/logout") Logout                  

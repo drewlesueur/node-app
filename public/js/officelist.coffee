@@ -36,7 +36,7 @@ add_search_result = (listing) ->
   marker = new google.maps.Marker
     position: new google.maps.LatLng listing.lat, listing.lng
     map: map
-  if marker.user is user
+  if listing.user is user
     marker.setDraggable true
   google.maps.event.addListener marker, "click", () ->
     bubble = new google.maps.InfoWindow
@@ -49,7 +49,7 @@ add_search_result = (listing) ->
       </div>
       "
     bubble.open map, marker
-    if marker.user is user
+    if listing.user is user
       $("h3.edit_listing").click()
       $(".edit_listing [name='location']").val(listing.location)
       $(".edit_listing [name='size']").val(listing.size)
