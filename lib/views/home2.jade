@@ -3,11 +3,13 @@ html
   head
     script(src="http://maps.google.com/maps/api/js?sensor=false")
     script(src="/js/jquery.js")
+    script(src="/js/jqueryui.js")
     script(src="/coffee/officelist.js")
+    link(type="text/css", rel="stylesheet", href="/css/style.css")
   body
-    table(border="1", width="100%")
+    table(width="100%", id="main_table")
       tr
-        td(colspan="2")
+        td(colspan="2", style="height: 75px;")
           table(width="100%")
             tr
               td
@@ -16,32 +18,55 @@ html
                 span#jingle the free way to search for real estate
               td(align="right")
                 - if (username)
-                  span Logged in as
+                  span Logged in as 
                     a(href : "http://twitter.com/" + username) #{username}
                     span |
                     a(href : "/logout") Logout                  
                 - else
                   a(href="/auth/twitter/callback") My listings
       tr
-        td(style="width: 300px;")
-          a#add_listing(href="#") Add Listing
-          hr
-          h3 Search
-          select#option
-            option For Lease
-          h3 Location
-          input#location
-          h3 Approx. size
-          input#approx_size
-          
-          h3 Keywords
-          input#keywords
-          
-          div          
-            a#search(href="#") Search
-
-          div
-            a#email_me(href="#") Email me when new properties match my search.
+        td#left_side.main(style="width: 300px;", valign="top")
+          h3.add_listing Add Listing
+          div.add_listing
+            select#option(name="type")
+              option For Lease
+            h5 Location
+            input#location(name="location")
+            h5 Size
+            input#size(name="size")
             
-        td
-          div#map(style="width:100%; height:600px") test
+            h5 Price
+            input#price(name="price")
+            select#price_type(name="price_type")
+              option Per Month
+            select#nnn(name="nnn")
+              option NNN
+            br
+            h5 Description
+            textarea
+            br
+            select#built(name="build")
+              option Built-out
+              option Shell
+
+            br
+            input(type="submit", value="Add")
+          h3.search_listings Search
+          div.search_listings
+            select#type
+              option For Lease
+            h5 Location
+            input#search_location
+            h5 Approx. size
+            input#search_approx_size
+            
+            h5 Keywords
+            input#search_keywords
+            br
+            input(type="submit", value="search")
+        
+            div
+              a#email_me(href="#") Email me when new properties match my search.
+            
+        td.main
+          div#map(style="width:100%; height: 200px;b") test

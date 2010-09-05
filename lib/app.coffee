@@ -1,5 +1,16 @@
+Client = require('mysql').Client
+client = new Client()
+client.user = 'root'
+# client.host = '127.0.0.1'
+client.password = 'k'
+client.connect()
+client.query('USE officelist');
+
 Auth = require "auth"
 fs = require "fs"
+require ("./underscore")
+require("./util")
+
 
 #for twitter
 config =
@@ -10,36 +21,68 @@ config =
 express = require("express")
 app = express.createServer()
 
+
+MyTest = (req, res, next) ->
+  req.party = "have a party"
+  res.party = "have a double time party"
+  if not req.session.officelist
+    req.session.officelist = {}
+
+  # log in on local so you don't have to log in
+  if _(req.headers.host).startsWith "local"
+    req.session.officelist.userdomain = "officelist"
+    req.session.officelist.userid = "local"
+  next()
+
+
 app.configure () ->
   app.set("root", __dirname)
   app.set('views', __dirname + '/views')
   # app.use(express.logger())
   app.use(express.staticProvider("public"))
-  console.log(__dirname)
+  # console.log(__dirname)
   app.use(express.methodOverride())
   app.use(express.bodyDecoder())
   app.use(express.cookieDecoder())
   app.use(express.session({ lifetime: (150).seconds, reapInterval: (10).seconds }))
   app.use(Auth([ Auth.Anonymous(), Auth.Never(), Auth.Twitter(config) ]))
+  app.use MyTest
 
 app.get "/", (req, res) ->
   if req.isAuthenticated()
+    
     res.render 'home2.jade', layout: false, locals:
       username: req.getAuthDetails().user.username
   else
+    console.log "having a what?: " + req.party
     res.render 'home2.jade', layout: false, locals:
       username: ""
 
+app.post "methods/:method", (req, res) ->
+  methods[req.param("method")] req, res
+
+
+
 
 app.get '/auth/twitter/callback', (req, res, params) ->
-  req.authenticate ['twitter'], (error, authenticated) ->
+  
+  if _(req.headers.host).startsWith "localhost"
+    authentication_strategy = "anon"
+  else
+    authentication_strategy = "twitter"
+  req.authenticate [authentication_strategy], (error, authenticated) ->
     res.writeHead(200, {'Content-Type': 'text/html'})
     if authenticated
+      req.session.officelist.userdomain = authentication_strategy
+      if authentication_strategy is "twitter"
+        req.session.officelist.userid = req.getAuthDetails().user.userid
+      else if authentication_strategy is "anon"
+        req.session.officelist.userid = req.getAuthDetails().user.username
       console.log "user login " +  JSON.stringify req.getAuthDetails()
       console.log req.session.access_token
       res.redirect "/"
     else
-      res.redirect "http://google.com"
+      res.redirect "/"
 
 app.get '/coffee/:name.js', (req, res) ->
   exec "coffee -c public/js/" + req.params.name + '.coffee', (error, stdout, stderr) ->

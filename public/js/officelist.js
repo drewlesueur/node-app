@@ -1,6 +1,6 @@
 (function() {
   $(document).ready(function() {
-    var initialize;
+    var initialize, the_height;
     initialize = function() {
       var latlng, map, myOptions;
       latlng = new google.maps.LatLng(33.4222685, -111.8226402);
@@ -12,6 +12,16 @@
       return (map = new google.maps.Map(document.getElementById("map"), myOptions));
     };
     initialize();
-    return console.log('lized');
+    $('#main_table').css({
+      height: $(window).height() + "px"
+    });
+    the_height = $("#map").parent().height() + "px";
+    console.log(the_height);
+    $("#map").css({
+      height: the_height
+    });
+    return $("#left_side").accordion({
+      autoHeight: false
+    });
   });
 })();
