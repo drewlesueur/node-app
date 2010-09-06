@@ -187,23 +187,18 @@
     button = $("#add_upload");
     interval = 0;
     return new AjaxUpload(button, {
-      action: "/upload",
+      action: "/upload-image",
       name: "myfile",
-      onSubmit: function(file, ext) {
+      onSubmit: function(file, text) {
         button.text("Uploading");
-        this.disable();
-        return (interval = window.setInterval(function() {
-          var text;
-          text = button.text;
-          return text.length < 13 ? button.text(text + ".") : button.text("Uploading...");
-        }, 200));
+        return this.disable();
       },
       onComplete: function(file, response) {
         console.log(response);
         button.text("Add Another");
         window.clearInterval(interval);
         this.enable();
-        return $('<div></div>').appendTo('#add_files_list').text(file);
+        return $('<img style="display: block; margin: 3px;">').appendTo('#add_files_list').attr("src", response);
       }
     });
   });

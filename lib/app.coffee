@@ -59,7 +59,16 @@ app.post "/upload-image", (req, res) ->
     if err
       res.send("error")
     if files
-      res.send(JSON.stringify files)
+      file_name = files.myfile.path.split "/"
+      file_name = _.s file_name, -1
+      output_file = "public/images/thumbs/#{file_name}"
+      exec "convert #{files.myfile.path} -resize 50x50 #{output_file}", (err, stdin, stdout) ->
+        medium_output_file = "public/images/medium/#{file_name}"
+        exec "convert #{files.myfile.path} -resize 450x450 #{medium_output_file}", (err, stdin, stdout) ->
+          res.send _.s(output_file, "public".length) #get rid of public from the string
+        
+        
+      #res.send(JSON.stringify files)
  
  
 app.get "/", (req, res) ->
@@ -78,7 +87,7 @@ app.get "/", (req, res) ->
 
 app.post "/methods/:method", (req, res) ->
   methods[req.param("method")] req, res
-
+    
 
 
 

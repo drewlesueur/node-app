@@ -147,23 +147,17 @@ $(document).ready () ->
   button = $("#add_upload")
   interval = 0;
   new AjaxUpload button,
-    action: "/upload"
+    action: "/upload-image"
     name: "myfile"
-    onSubmit : (file, ext) ->
+    onSubmit : (file, text) ->
       button.text "Uploading"
       this.disable()
-      interval = window.setInterval (() ->
-        text = button.text
-        if text.length < 13
-          button.text text + "."
-        else
-          button.text "Uploading..."), 200
     onComplete: (file, response) ->
       console.log response
       button.text "Add Another"
       window.clearInterval interval
       this.enable()
-      $('<div></div>').appendTo('#add_files_list').text file
+      $('<img style="display: block; margin: 3px;">').appendTo('#add_files_list').attr "src", response
         
     
       
