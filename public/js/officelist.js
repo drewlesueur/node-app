@@ -1,7 +1,8 @@
 (function() {
-  var add_google_map_marker, add_search_result, current_listing, map, markers, remove_markers, rpc, user;
+  var add_google_map_marker, add_search_result, bubbles, current_listing, map, markers, remove_markers, rpc, user;
   user = "";
   current_listing = "";
+  bubbles = [];
   rpc = function(method, params, good) {
     return $.ajax({
       type: "POST",
