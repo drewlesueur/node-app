@@ -9,6 +9,8 @@ require.paths.unshift("vendor/node-oauth/lib")
 require.paths.unshift("vendor/node-mongodb-native/lib")
 require.paths.unshift("vendor/node-mysql/lib")
 require.paths.unshift("vendor/jade/lib")
+require.paths.unshift("vendor/connect-form/lib")
+require.paths.unshift("vendor/node-formidable/lib")
 
 # require the actual express app
 app = require "./lib/app.coffee"

@@ -140,9 +140,30 @@ $(document).ready () ->
     catch e
       alert e
       return false
-        
+   
           
-        
+  $(".multi").MultiFile()
+  
+  button = $("#add_upload")
+  interval = 0;
+  new AjaxUpload button,
+    action: "/upload"
+    name: "myfile"
+    onSubmit : (file, ext) ->
+      button.text "Uploading"
+      this.disable()
+      interval = window.setInterval (() ->
+        text = button.text
+        if text.length < 13
+          button.text text + "."
+        else
+          button.text "Uploading..."), 200
+    onComplete: (file, response) ->
+      console.log response
+      button.text "Add Another"
+      window.clearInterval interval
+      this.enable()
+      $('<div></div>').appendTo('#add_files_list').text file
         
     
       

@@ -7,6 +7,8 @@ html
     script(src="/js/underscore.js")
     script(src="/js/util.js")    
     script(src="/coffee/officelist.js")
+    script(src="/js/jquery.MultiFile.pack.js")
+    script(src="/js/ajaxupload.js")
     link(type="text/css", rel="stylesheet", href="/css/style.css")
   body
     table(width="100%", id="main_table")
@@ -51,7 +53,10 @@ html
               select#built(name="built")
                 option Built-out
                 option Shell
-
+              h5 image
+              span#add_upload Add an image
+              br
+              div#add_files_list 
               br
               input(type="submit", value="Add")
           h3.edit_listing Edit Listing
@@ -77,7 +82,7 @@ html
               select(name="built")
                 option Built-out
                 option Shell
-
+          
               br
               input(type="submit", value="Edit")
           h3.search_listings Search

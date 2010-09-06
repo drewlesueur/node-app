@@ -8,6 +8,7 @@ client.password = data_config.password
 client.connect()
 client.query('USE officelist');
 
+
 this.client = client
 
 Auth = require "auth"
@@ -19,10 +20,10 @@ require("./methods")
 
 
 
-
-
+form = require "connect-form"
 express = require("express")
 app = express.createServer()
+
 
 
 MyTest = (req, res, next) ->
@@ -33,7 +34,7 @@ MyTest = (req, res, next) ->
 
   req.officelistUser = () ->
     return req.session.officelist.userdomain + ":" + req.session.officelist.userid
-
+  
   next()
 
 
@@ -49,7 +50,18 @@ app.configure () ->
   app.use(express.session({ lifetime: (150).seconds, reapInterval: (10).seconds }))
   app.use(Auth([ Auth.Anonymous(), Auth.Never(), Auth.Twitter(twitter_config) ]))
   app.use MyTest
+  app.use form(keepExtensions: true)
 
+
+# take and image upload it and return the address for the thumbnail
+app.post "/upload-image", (req, res) ->
+  req.form.complete (err, fields, files) ->
+    if err
+      res.send("error")
+    if files
+      res.send(JSON.stringify files)
+ 
+ 
 app.get "/", (req, res) ->
   if req.isAuthenticated()
     
