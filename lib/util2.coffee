@@ -34,3 +34,31 @@ this.data =
     wheres = _.s wheres, 0, -(" and ".length) #removeing last 'and'
     query = "UPDATE #{table} SET #{sets} WHERE #{wheres}"
     client.query query, real_vals, ret
+
+  insertMany: (table, fields, vals, ret) ->
+    db_fields = []
+    _.each fields, (field) ->
+      db_fields.push "`#{field}`, "
+    fields = db_fields.join "" #join fields
+    fields = _.s fields, 0, -2 #remove trailing comma
+    
+    console.log fields
+    
+    values = []
+    real_values = []
+    _.each vals, (arr) ->
+      values.push "("
+      _.each arr, (each_val) ->
+        values.push "?, "
+        real_values.push each_val
+      values[values.length - 1] = _.s values[values.length - 1], 0, -2
+      values.push "), "
+    values = values.join ""
+    values = _.s values, 0, -2
+    
+    query = "INSERT INTO #{table} (#{fields}) VALUES #{values}"
+    client.query query, real_values, ret
+    
+    
+    
+    

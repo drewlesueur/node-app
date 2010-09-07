@@ -7,10 +7,15 @@ this.methods =
       insert[val] = req.param(val) or ""
       
     data.insert "listings", insert, (error, results, fields) ->
-      res.send
-        result: results
-        id: fields
-        error: error
+      if req.body.images
+        inserts = []
+        _.each req.body.images, (url) ->
+          inserts.push [results.insertId, url]
+        data.insertMany "images", ["listing", "url"], inserts, (image_error, image_results, image_fields) ->        
+          res.send
+            result: results
+            id: fields
+            error: error
         
   get_all_listings: (req, res) ->
     data.q "select * from listings", (error, results) ->

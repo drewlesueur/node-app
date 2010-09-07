@@ -146,6 +146,7 @@ $(document).ready () ->
   
   button = $("#add_upload")
   interval = 0;
+  add_image_count = 0
   new AjaxUpload button,
     action: "/upload-image"
     name: "myfile"
@@ -153,11 +154,15 @@ $(document).ready () ->
       button.text "Uploading"
       this.disable()
     onComplete: (file, response) ->
-      console.log response
+      input = $("<input type='hidden'>")
+      input.val("/images/medium/" + response)
+      input.attr "name", "images[#{add_image_count}]"
+      $("#add_form").append input
+      add_image_count += 1
       button.text "Add Another"
       window.clearInterval interval
       this.enable()
-      $('<img style="display: block; margin: 3px;">').appendTo('#add_files_list').attr "src", response
+      $('<img style="display: block; margin: 3px;">').appendTo('#add_files_list').attr "src", "/images/thumbs/#{response}"
         
     
       

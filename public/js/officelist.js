@@ -85,7 +85,7 @@
     });
   };
   $(document).ready(function() {
-    var button, initialize, interval, the_height;
+    var add_image_count, button, initialize, interval, the_height;
     user = $("#user").attr("data-officelist-user");
     initialize = function() {
       var latlng, myOptions;
@@ -186,6 +186,7 @@
     $(".multi").MultiFile();
     button = $("#add_upload");
     interval = 0;
+    add_image_count = 0;
     return new AjaxUpload(button, {
       action: "/upload-image",
       name: "myfile",
@@ -194,11 +195,16 @@
         return this.disable();
       },
       onComplete: function(file, response) {
-        console.log(response);
+        var input;
+        input = $("<input type='hidden'>");
+        input.val("/images/medium/" + response);
+        input.attr("name", "images[" + (add_image_count) + "]");
+        $("#add_form").append(input);
+        add_image_count += 1;
         button.text("Add Another");
         window.clearInterval(interval);
         this.enable();
-        return $('<img style="display: block; margin: 3px;">').appendTo('#add_files_list').attr("src", response);
+        return $('<img style="display: block; margin: 3px;">').appendTo('#add_files_list').attr("src", "/images/thumbs/" + (response));
       }
     });
   });
