@@ -7,16 +7,38 @@ this.methods =
       insert[val] = req.param(val) or ""
       
     data.insert "listings", insert, (error, results, fields) ->
+      
+      images_done = false
+      youtube_done = false
+      
+      done = () ->
+        if images_done and youtube_done
+          res.send
+            result: results
+            error: error
       if req.body.images
         inserts = []
         _.each req.body.images, (url) ->
-          inserts.push [results.insertId, url]
+          inserts.push [results.insertId, url] 
         data.insertMany "images", ["listing", "url"], inserts, (image_error, image_results, image_fields) ->        
-          res.send
-            result: results
-            id: fields
-            error: error
+          images_done = true
+          done()
+      else
+        images_done = true
+          
+      if req.body.youtube
+        inserts = []
+        _.each req.body.youtube, (url) ->
+          inserts.push [results.insertId, url]
+        data.insertMany "youtube", ["listing", "url"], inserts, (youtube_error, youtube_results, youtube_fields) ->          
+          youtube_done = true
+          done()
+      else
+        youtube_done = true
         
+      done()
+            
+            
   get_all_listings: (req, res) ->
     data.q "select * from listings", (error, results) ->
       res.send results

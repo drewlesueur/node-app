@@ -85,7 +85,7 @@
     });
   };
   $(document).ready(function() {
-    var add_image_count, button, initialize, interval, the_height;
+    var add_image_count, add_youtube_count, button, initialize, interval, the_height;
     user = $("#user").attr("data-officelist-user");
     initialize = function() {
       var latlng, myOptions;
@@ -187,7 +187,8 @@
     button = $("#add_upload");
     interval = 0;
     add_image_count = 0;
-    return new AjaxUpload(button, {
+    add_youtube_count = 0;
+    new AjaxUpload(button, {
       action: "/upload-image",
       name: "myfile",
       onSubmit: function(file, text) {
@@ -206,6 +207,20 @@
         this.enable();
         return $('<img style="display: block; margin: 3px;">').appendTo('#add_files_list').attr("src", "/images/thumbs/" + (response));
       }
+    });
+    return $("#add_youtube").click(function(e) {
+      var a, input;
+      input = $("<input class='youtube_inupt' type='text'>");
+      input.attr("name", add_youtube_count);
+      add_youtube_count += 1;
+      a = $("<a href='#'>Remove</a>");
+      a.click(function(e) {
+        $(this).prev().remove();
+        $(this).remove();
+        return false;
+      });
+      $("#add_youtube_box").append(input).append(a);
+      return false;
     });
   });
 })();

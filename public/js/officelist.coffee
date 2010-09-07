@@ -147,6 +147,8 @@ $(document).ready () ->
   button = $("#add_upload")
   interval = 0;
   add_image_count = 0
+  add_youtube_count = 0
+  
   new AjaxUpload button,
     action: "/upload-image"
     name: "myfile"
@@ -166,8 +168,19 @@ $(document).ready () ->
         
     
       
+  $("#add_youtube").click (e) ->    
+      input = $("<input class='youtube_inupt' type='text'>")
+      input.attr "name", add_youtube_count
+      add_youtube_count  += 1
+      a = $("<a href='#'>Remove</a>")
+      a.click (e) ->
+        $(this).prev().remove()
+        $(this).remove()
+        return false
+        
+      $("#add_youtube_box").append(input).append(a)
       
-      
+      return false
       
     
    
