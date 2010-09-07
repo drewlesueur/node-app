@@ -58,6 +58,11 @@
     }
     return google.maps.event.addListener(marker, "click", function() {
       var bubble;
+      rpc("get_listing_images", {
+        id: listing.id
+      }, function(data) {
+        return console.log(data);
+      });
       bubble = new google.maps.InfoWindow({
         content: ("\
       [image]\
@@ -68,6 +73,11 @@
       </div>\
       ")
       });
+      _.each(bubbles, function(bubble) {
+        return bubble.close();
+      });
+      bubbles = [];
+      bubbles.push(bubble);
       bubble.open(map, marker);
       if (listing.user === user) {
         $("h3.edit_listing").click();

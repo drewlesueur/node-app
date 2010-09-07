@@ -1,5 +1,8 @@
 require "./secret.coffee"
 
+request = require "request"
+this.request = request
+
 Client = require('mysql').Client
 client = new Client()
 client.user = data_config.user

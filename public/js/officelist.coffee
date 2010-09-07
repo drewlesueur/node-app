@@ -40,6 +40,8 @@ add_search_result = (listing) ->
   if listing.user is user
     marker.setDraggable true
   google.maps.event.addListener marker, "click", () ->
+    rpc "get_listing_images", id: listing.id, (data) ->
+      console.log data
     bubble = new google.maps.InfoWindow
       content: "
       [image]
@@ -49,6 +51,11 @@ add_search_result = (listing) ->
       #{listing.description or ""}
       </div>
       "
+      
+    _.each bubbles, (bubble) ->
+      bubble.close()
+    bubbles = []
+    bubbles.push bubble
     bubble.open map, marker
     if listing.user is user
       $("h3.edit_listing").click()
