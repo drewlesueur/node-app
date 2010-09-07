@@ -43,10 +43,25 @@ add_search_result = (listing) ->
     rpc "get_listing_images", id: listing.id, (data) ->
       console.log data
       
-      info = $("<div><br /><br /></div>")
+      info = $("<div><br /></div>")
       if data.youtubes.length > 0
         info.append data.youtubes[0].html
-        console.log info
+      info.append("""
+      <table>
+        <tr>
+          <td width="70%" valign="top">
+            <h3>test #{listing.location}</h3>
+            <div>#{listing.description}</div>
+          <td>
+          <td width="30%" valign="top">
+            #{listing.price} #{listing.price_type}
+            <br>
+            #{listing.size}
+            #{listing.built} #{listing.type}
+          <td>
+        </tr>
+      </table>
+      """)
       bubble = new google.maps.InfoWindow
         content: info[0]
         
@@ -67,7 +82,7 @@ add_search_result = (listing) ->
         $(".edit_listing [name='built']").val(listing.built)
         current_listing = listing.id
         markers = [marker]
-
+        
       
 
 $(document).ready () ->

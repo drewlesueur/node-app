@@ -14,36 +14,37 @@ this.methods =
       # next project use mongodb
       # your posts would not be url encoded. they would just be json strings
       
-      images_done = false
-      youtube_done = false
+      do_images = (done) ->      
+        if req.body.images
+          inserts = []
+          _.each req.body.images, (url) ->
+            inserts.push [results.insertId, url] 
+          data.insertMany "images", ["listing", "url"], inserts, (image_error, image_results, image_fields) ->        
+            done()
+        else
+          console.log "done with images"
+          done()
       
-      done = () ->
-        if images_done and youtube_done
-          res.send
-            result: results
-            error: error
-      if req.body.images
-        inserts = []
-        _.each req.body.images, (url) ->
-          inserts.push [results.insertId, url] 
-        data.insertMany "images", ["listing", "url"], inserts, (image_error, image_results, image_fields) ->        
-          images_done = true
-          done()
-      else
-        images_done = true
+      do_youtube = (done) ->
+        if req.body.youtube
+          inserts = []
+          get_youtube_embed req.body.youtube, (embed) ->
+            inserts = []
+            console.log req.body.youtube
+            _.each req.body.youtube, (url, key) -> 
+              inserts.push [results.insertId, url, embed[key]]
+            data.insertMany "youtube", ["listing", "url", "html"], inserts, (youtube_error, youtube_results, youtube_fields) ->          
+              console.log "done with youtube for real"
+              done()
+        else
           
-      if req.body.youtube
-        inserts = []
-        _.each req.body.youtube, (url) ->
-          inserts.push [results.insertId, url]
-        data.insertMany "youtube", ["listing", "url"], inserts, (youtube_error, youtube_results, youtube_fields) ->          
-          youtube_done = true
           done()
-      else
-        youtube_done = true
+      
+      _.do_these [do_images, do_youtube], (ret) ->
+        res.send
+          result: results
+          error: error
         
-      done()
-            
             
   get_all_listings: (req, res) ->
     data.q "select * from listings", (error, results) ->
@@ -121,3 +122,38 @@ this.methods =
       done()
       
       
+
+get_youtube_embed = (urls, done) ->
+  #return done(urls)
+  make_the_request = (url, done) ->
+    if url.indexOf("#p") != -1
+      url = url.split "/"
+      url = _.s url, -1
+      url = "http://www.youtube.com/watch?v=#{url}"
+    request uri: "http://www.youtube.com/oembed?url=#{encodeURIComponent(url)}&format=json", (err, response, body) ->
+      if not err and response.statusCode is 200
+        done(JSON.parse(body).html)
+      else
+        done("yowser")
+  todos = ((done) -> make_the_request(url, done)) for key, url of urls
+  
+  _.do_these todos, (ret) ->
+    console.log ["being done ", ret]
+    done ret
+  
+#get_youtube_embed = (urls, done) ->
+#  ret = []
+#  accounted_for = 0;
+#  if urls.length is 0
+#    done(ret)
+#  _.each urls, (url) ->
+#    if url.indexOf("#p") != -1
+#      url = url.split "/"
+#      url = _.s url, -1
+#      url = "http://www.youtube.com/watch?v=#{url}"
+#    request uri: "http://www.youtube.com/oembed?url=#{encodeURIComponent(obj.url)}&format=json", (err, response, body) ->
+#      accounted_for += 1
+#      if not err and response.statusCode is 200
+#        ret.push JSON.parse(body)
+#      if accounted_for is results.length
+#       done(ret)

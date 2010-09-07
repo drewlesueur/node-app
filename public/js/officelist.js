@@ -62,11 +62,11 @@
       }, function(data) {
         var bubble, info;
         console.log(data);
-        info = $("<div><br /><br /></div>");
+        info = $("<div><br /></div>");
         if (data.youtubes.length > 0) {
           info.append(data.youtubes[0].html);
-          console.log(info);
         }
+        info.append("<table>\n  <tr>\n    <td width=\"70%\" valign=\"top\">\n      <h3>test " + (listing.location) + "</h3>\n      <div>" + (listing.description) + "</div>\n    <td>\n    <td width=\"30%\" valign=\"top\">\n      " + (listing.price) + " " + (listing.price_type) + "\n      <br>\n      " + (listing.size) + "\n      " + (listing.built) + " " + (listing.type) + "\n    <td>\n  </tr>\n</table>");
         bubble = new google.maps.InfoWindow({
           content: info[0]
         });
