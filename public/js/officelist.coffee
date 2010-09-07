@@ -42,33 +42,31 @@ add_search_result = (listing) ->
   google.maps.event.addListener marker, "click", () ->
     rpc "get_listing_images", id: listing.id, (data) ->
       console.log data
-    bubble = new google.maps.InfoWindow
-      content: "
-      [image]
-      <br>
-      <h3>#{listing.location}</h3>
-      <div>
-      #{listing.description or ""}
-      </div>
-      "
       
-    _.each bubbles, (bubble) ->
-      bubble.close()
-    bubbles = []
-    bubbles.push bubble
-    bubble.open map, marker
-    if listing.user is user
-      $("h3.edit_listing").click()
-      $(".edit_listing [name='location']").val(listing.location)
-      $(".edit_listing [name='size']").val(listing.size)
-      $(".edit_listing [name='price']").val(listing.price)
-      $(".edit_listing [name='price_type']").val(listing.price_type)
-      $(".edit_listing [name='price_type']").val(listing.price_type)
-      $(".edit_listing [name='nnn']").val(listing.nnn)
-      $(".edit_listing [name='description']").val(listing.description)
-      $(".edit_listing [name='built']").val(listing.built)
-      current_listing = listing.id
-      markers = [marker]
+      info = $("<div><br /><br /></div>")
+      if data.youtubes.length > 0
+        info.append data.youtubes[0].html
+        console.log info
+      bubble = new google.maps.InfoWindow
+        content: info[0]
+        
+      _.each bubbles, (bubble) ->
+        bubble.close()
+      bubbles = []
+      bubbles.push bubble
+      bubble.open map, marker
+      if listing.user is user
+        $("h3.edit_listing").click()
+        $(".edit_listing [name='location']").val(listing.location)
+        $(".edit_listing [name='size']").val(listing.size)
+        $(".edit_listing [name='price']").val(listing.price)
+        $(".edit_listing [name='price_type']").val(listing.price_type)
+        $(".edit_listing [name='price_type']").val(listing.price_type)
+        $(".edit_listing [name='nnn']").val(listing.nnn)
+        $(".edit_listing [name='description']").val(listing.description)
+        $(".edit_listing [name='built']").val(listing.built)
+        current_listing = listing.id
+        markers = [marker]
 
       
 
@@ -188,7 +186,4 @@ $(document).ready () ->
       $("#add_youtube_box").append(input).append(a)
       
       return false
-      
-    
-   
     

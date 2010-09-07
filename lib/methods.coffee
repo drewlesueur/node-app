@@ -110,9 +110,9 @@ this.methods =
             accounted_for += 1
             console.log "yaaay"
             if not err and response.statusCode is 200
-              ret.push obj.url + " " + body
+              ret.push JSON.parse(body)
             else
-              ret.push obj.url + " bad"
+              1 == 1
             if accounted_for is results.length
               youtubes = ret
               done()

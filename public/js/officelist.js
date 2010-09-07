@@ -57,41 +57,39 @@
       marker.setDraggable(true);
     }
     return google.maps.event.addListener(marker, "click", function() {
-      var bubble;
-      rpc("get_listing_images", {
+      return rpc("get_listing_images", {
         id: listing.id
       }, function(data) {
-        return console.log(data);
+        var bubble, info;
+        console.log(data);
+        info = $("<div><br /><br /></div>");
+        if (data.youtubes.length > 0) {
+          info.append(data.youtubes[0].html);
+          console.log(info);
+        }
+        bubble = new google.maps.InfoWindow({
+          content: info[0]
+        });
+        _.each(bubbles, function(bubble) {
+          return bubble.close();
+        });
+        bubbles = [];
+        bubbles.push(bubble);
+        bubble.open(map, marker);
+        if (listing.user === user) {
+          $("h3.edit_listing").click();
+          $(".edit_listing [name='location']").val(listing.location);
+          $(".edit_listing [name='size']").val(listing.size);
+          $(".edit_listing [name='price']").val(listing.price);
+          $(".edit_listing [name='price_type']").val(listing.price_type);
+          $(".edit_listing [name='price_type']").val(listing.price_type);
+          $(".edit_listing [name='nnn']").val(listing.nnn);
+          $(".edit_listing [name='description']").val(listing.description);
+          $(".edit_listing [name='built']").val(listing.built);
+          current_listing = listing.id;
+          return (markers = [marker]);
+        }
       });
-      bubble = new google.maps.InfoWindow({
-        content: ("\
-      [image]\
-      <br>\
-      <h3>" + (listing.location) + "</h3>\
-      <div>\
-      " + (listing.description || "") + "\
-      </div>\
-      ")
-      });
-      _.each(bubbles, function(bubble) {
-        return bubble.close();
-      });
-      bubbles = [];
-      bubbles.push(bubble);
-      bubble.open(map, marker);
-      if (listing.user === user) {
-        $("h3.edit_listing").click();
-        $(".edit_listing [name='location']").val(listing.location);
-        $(".edit_listing [name='size']").val(listing.size);
-        $(".edit_listing [name='price']").val(listing.price);
-        $(".edit_listing [name='price_type']").val(listing.price_type);
-        $(".edit_listing [name='price_type']").val(listing.price_type);
-        $(".edit_listing [name='nnn']").val(listing.nnn);
-        $(".edit_listing [name='description']").val(listing.description);
-        $(".edit_listing [name='built']").val(listing.built);
-        current_listing = listing.id;
-        return (markers = [marker]);
-      }
     });
   };
   $(document).ready(function() {
