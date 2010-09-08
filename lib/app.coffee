@@ -126,4 +126,4 @@ app.get "/logout", (req, res, params) ->
   res.redirect "/"
 
 exports.run = () ->
-  app.listen parseInt(process.env.PORT or 8889), null
+  app.listen parseInt(process.env.PORT or 86), null
