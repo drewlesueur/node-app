@@ -57,39 +57,36 @@
       marker.setDraggable(true);
     }
     return google.maps.event.addListener(marker, "click", function() {
-      return rpc("get_listing_images", {
-        id: listing.id
-      }, function(data) {
-        var bubble, info;
-        console.log(data);
-        info = $("<div><br /></div>");
-        if (data.youtubes.length > 0) {
-          info.append(data.youtubes[0].html);
-        }
-        info.append("<table>\n  <tr>\n    <td width=\"70%\" valign=\"top\">\n      <h3>test " + (listing.location) + "</h3>\n      <div>" + (listing.description) + "</div>\n    <td>\n    <td width=\"30%\" valign=\"top\">\n      " + (listing.price) + " " + (listing.price_type) + "\n      <br>\n      " + (listing.size) + "\n      " + (listing.built) + " " + (listing.type) + "\n    <td>\n  </tr>\n</table>");
-        bubble = new google.maps.InfoWindow({
-          content: info[0]
-        });
-        _.each(bubbles, function(bubble) {
-          return bubble.close();
-        });
-        bubbles = [];
-        bubbles.push(bubble);
-        bubble.open(map, marker);
-        if (listing.user === user) {
-          $("h3.edit_listing").click();
-          $(".edit_listing [name='location']").val(listing.location);
-          $(".edit_listing [name='size']").val(listing.size);
-          $(".edit_listing [name='price']").val(listing.price);
-          $(".edit_listing [name='price_type']").val(listing.price_type);
-          $(".edit_listing [name='price_type']").val(listing.price_type);
-          $(".edit_listing [name='nnn']").val(listing.nnn);
-          $(".edit_listing [name='description']").val(listing.description);
-          $(".edit_listing [name='built']").val(listing.built);
-          current_listing = listing.id;
-          return (markers = [marker]);
-        }
+      var bubble, info;
+      info = $("<div><br /></div>");
+      if ("default_youtube" in listing) {
+        info.append(listing.default_youtube);
+      } else if ("default_image" in listing) {
+        info.append("<img src=\"" + (listing.default_image) + "\" />");
+      }
+      info.append("<table>\n  <tr>\n    <td width=\"70%\" valign=\"top\">\n      <h3>test " + (listing.location) + "</h3>\n      <div>" + (listing.description) + "</div>\n    <td>\n    <td width=\"30%\" valign=\"top\">\n      " + (listing.price) + " " + (listing.price_type) + "\n      <br>\n      " + (listing.size) + "\n      " + (listing.built) + " " + (listing.type) + "\n    <td>\n  </tr>\n</table>");
+      bubble = new google.maps.InfoWindow({
+        content: info[0]
       });
+      _.each(bubbles, function(bubble) {
+        return bubble.close();
+      });
+      bubbles = [];
+      bubbles.push(bubble);
+      bubble.open(map, marker);
+      if (listing.user === user) {
+        $("h3.edit_listing").click();
+        $(".edit_listing [name='location']").val(listing.location);
+        $(".edit_listing [name='size']").val(listing.size);
+        $(".edit_listing [name='price']").val(listing.price);
+        $(".edit_listing [name='price_type']").val(listing.price_type);
+        $(".edit_listing [name='price_type']").val(listing.price_type);
+        $(".edit_listing [name='nnn']").val(listing.nnn);
+        $(".edit_listing [name='description']").val(listing.description);
+        $(".edit_listing [name='built']").val(listing.built);
+        current_listing = listing.id;
+        return (markers = [marker]);
+      }
     });
   };
   $(document).ready(function() {
@@ -150,6 +147,12 @@
             return (listing[item.name] = item.value);
           });
           listing.id = ret.result.insertId;
+          if ("youtubes" in ret.result) {
+            listing.youtube_htmls = ret.result.youtubes;
+            if (ret.result.youtubes.length > 0) {
+              listing.default_youtube = ret.result.youtubes[0];
+            }
+          }
           listing.user = user;
           add_search_result(listing);
           remove_markers();
@@ -219,8 +222,8 @@
     return $("#add_youtube").click(function(e) {
       var a, input;
       input = $("<input class='youtube_inupt' type='text'>");
-      input.attr("name", add_youtube_count);
       add_youtube_count += 1;
+      input.attr("name", "youtube[" + add_youtube_count + "]");
       a = $("<a href='#'>Remove</a>");
       a.click(function(e) {
         $(this).prev().remove();

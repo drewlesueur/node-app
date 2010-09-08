@@ -63,6 +63,23 @@ html
               div#add_files_list 
               br
               input(type="submit", value="Add")
+          h3.search_listings Search
+          div.search_listings
+            form
+              select#type
+                option For Lease
+              h5 Location
+              input#search_location
+              h5 Approx. size
+              input#search_approx_size
+              
+              h5 Keywords
+              input#search_keywords
+              br
+              input(type="submit", value="search")
+          
+              div
+                a#email_me(href="#") Email me when new properties match my search.
           h3.edit_listing Edit Listing
           div.edit_listing
             form#edit_form(method="POST", action="/")
@@ -89,23 +106,6 @@ html
           
               br
               input(type="submit", value="Edit")
-          h3.search_listings Search
-          div.search_listings
-            form
-              select#type
-                option For Lease
-              h5 Location
-              input#search_location
-              h5 Approx. size
-              input#search_approx_size
-              
-              h5 Keywords
-              input#search_keywords
-              br
-              input(type="submit", value="search")
-          
-              div
-                a#email_me(href="#") Email me when new properties match my search.
             
         td.main
           div#map(style="width:100%; height: 200px;b") test

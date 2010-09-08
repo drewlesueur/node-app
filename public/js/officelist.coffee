@@ -39,51 +39,53 @@ add_search_result = (listing) ->
     map: map
   if listing.user is user
     marker.setDraggable true
-  google.maps.event.addListener marker, "click", () ->
-    rpc "get_listing_images", id: listing.id, (data) ->
-      console.log data
+  google.maps.event.addListener marker, "click", () ->    
+    info = $("<div><br /></div>")
+    
+    if "default_youtube" of listing
+      info.append listing.default_youtube
+    else if "default_image" of listing
+      info.append """
+      <img src="#{listing.default_image}" />
+      """
+    info.append("""
+    <table>
+      <tr>
+        <td width="70%" valign="top">
+          <h3>test #{listing.location}</h3>
+          <div>#{listing.description}</div>
+        <td>
+        <td width="30%" valign="top">
+          #{listing.price} #{listing.price_type}
+          <br>
+          #{listing.size}
+          #{listing.built} #{listing.type}
+        <td>
+      </tr>
+    </table>
+    """)
+    bubble = new google.maps.InfoWindow
+      content: info[0]
       
-      info = $("<div><br /></div>")
-      if data.youtubes.length > 0
-        info.append data.youtubes[0].html
-      info.append("""
-      <table>
-        <tr>
-          <td width="70%" valign="top">
-            <h3>test #{listing.location}</h3>
-            <div>#{listing.description}</div>
-          <td>
-          <td width="30%" valign="top">
-            #{listing.price} #{listing.price_type}
-            <br>
-            #{listing.size}
-            #{listing.built} #{listing.type}
-          <td>
-        </tr>
-      </table>
-      """)
-      bubble = new google.maps.InfoWindow
-        content: info[0]
-        
-      _.each bubbles, (bubble) ->
-        bubble.close()
-      bubbles = []
-      bubbles.push bubble
-      bubble.open map, marker
-      if listing.user is user
-        $("h3.edit_listing").click()
-        $(".edit_listing [name='location']").val(listing.location)
-        $(".edit_listing [name='size']").val(listing.size)
-        $(".edit_listing [name='price']").val(listing.price)
-        $(".edit_listing [name='price_type']").val(listing.price_type)
-        $(".edit_listing [name='price_type']").val(listing.price_type)
-        $(".edit_listing [name='nnn']").val(listing.nnn)
-        $(".edit_listing [name='description']").val(listing.description)
-        $(".edit_listing [name='built']").val(listing.built)
-        current_listing = listing.id
-        markers = [marker]
-        
+    _.each bubbles, (bubble) ->
+      bubble.close()
+    bubbles = []
+    bubbles.push bubble
+    bubble.open map, marker
+    if listing.user is user
+      $("h3.edit_listing").click()
+      $(".edit_listing [name='location']").val(listing.location)
+      $(".edit_listing [name='size']").val(listing.size)
+      $(".edit_listing [name='price']").val(listing.price)
+      $(".edit_listing [name='price_type']").val(listing.price_type)
+      $(".edit_listing [name='price_type']").val(listing.price_type)
+      $(".edit_listing [name='nnn']").val(listing.nnn)
+      $(".edit_listing [name='description']").val(listing.description)
+      $(".edit_listing [name='built']").val(listing.built)
+      current_listing = listing.id
+      markers = [marker]
       
+    
 
 $(document).ready () ->
   user = $("#user").attr "data-officelist-user"
@@ -134,6 +136,10 @@ $(document).ready () ->
         _.each data, (item) ->
           listing[item.name] = item.value
         listing.id = ret.result.insertId
+        if "youtubes" of ret.result
+          listing.youtube_htmls = ret.result.youtubes
+          if ret.result.youtubes.length > 0
+            listing.default_youtube = ret.result.youtubes[0]
         listing.user = user
         add_search_result listing
         remove_markers() #remove the adding markers
@@ -190,8 +196,8 @@ $(document).ready () ->
       
   $("#add_youtube").click (e) ->    
       input = $("<input class='youtube_inupt' type='text'>")
-      input.attr "name", add_youtube_count
       add_youtube_count  += 1
+      input.attr "name", "youtube[" + add_youtube_count + "]"
       a = $("<a href='#'>Remove</a>")
       a.click (e) ->
         $(this).prev().remove()

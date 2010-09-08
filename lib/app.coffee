@@ -105,7 +105,7 @@ app.get '/auth/twitter/callback', (req, res, params) ->
     if authenticated
       req.session.officelist.userdomain = authentication_strategy
       if authentication_strategy is "twitter"
-        req.session.officelist.userid = req.getAuthDetails().user.userid
+        req.session.officelist.userid = req.getAuthDetails().user.user_id
       else if authentication_strategy is "anon"
         req.session.officelist.userid = req.getAuthDetails().user.username
       # console.log "user login " +  JSON.stringify req.getAuthDetails()
