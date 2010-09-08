@@ -9,8 +9,9 @@
       url: "/methods/" + method,
       data: params,
       success: good,
-      error: function() {
-        return alert("oops");
+      error: function(e) {
+        alert(e.status);
+        return alert(e.responseText);
       }
     });
   };
@@ -57,10 +58,14 @@
       marker.setDraggable(true);
     }
     return google.maps.event.addListener(marker, "click", function() {
-      var bubble, info;
-      info = $("<div><br /></div>");
+      var bubble, framer, info;
+      info = $("<div style='width: 500px;'><br /></div>");
       if ("default_youtube" in listing) {
-        info.append(listing.default_youtube);
+        framer = $("<iframe src='/empty.html'><iframe>");
+        $(framer).load(function() {
+          return $(framer).contents().find("body").append(listing.default_youtube);
+        });
+        info.append(framer);
       } else if ("default_image" in listing) {
         info.append("<img src=\"" + (listing.default_image) + "\" />");
       }

@@ -8,7 +8,10 @@ rpc = (method, params, good) ->
     url: "/methods/" + method
     data: params
     success: good
-    error: () -> alert "oops"
+    error: (e) -> 
+      # for x of e
+      alert e.status
+      alert e.responseText
 
 map = ""
 markers = []  
@@ -40,14 +43,24 @@ add_search_result = (listing) ->
   if listing.user is user
     marker.setDraggable true
   google.maps.event.addListener marker, "click", () ->    
-    info = $("<div><br /></div>")
+    info = $("<div style='width: 500px;'><br /></div>")
     
     if "default_youtube" of listing
-      info.append listing.default_youtube
+      
+      # webkit doesn't like this, have to use iframe
+      #info.append listing.default_youtube
+      
+      
+      framer = $("<iframe src='/empty.html'><iframe>")
+      $(framer).load () ->
+        $(framer).contents().find("body").append listing.default_youtube
+      info.append framer
+      
     else if "default_image" of listing
       info.append """
       <img src="#{listing.default_image}" />
       """
+    
     info.append("""
     <table>
       <tr>
@@ -64,6 +77,8 @@ add_search_result = (listing) ->
       </tr>
     </table>
     """)
+    
+    
     bubble = new google.maps.InfoWindow
       content: info[0]
       
