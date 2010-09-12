@@ -35,3 +35,13 @@ td.main {
 .youtube_inupt {
   margin: 2px;
 }
+
+
+#popup {
+  background: none repeat scroll 0 0 #FFFFF;
+  border: 1px solid black;
+  margin: 0;
+  padding: 7px;
+  width: 425px;
+  height: 350px;
+}

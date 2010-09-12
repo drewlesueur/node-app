@@ -1,8 +1,10 @@
 (function() {
-  var add_google_map_marker, add_search_result, bubbles, current_listing, map, markers, remove_markers, rpc, user;
+  var add_google_map_marker, add_search_result, bubbles, current_listing, map, markers, remove_markers, rpc, user, vid_height, vid_width;
   user = "";
   current_listing = "";
   bubbles = [];
+  vid_height = 344;
+  vid_width = 425;
   rpc = function(method, params, good) {
     return $.ajax({
       type: "POST",
@@ -58,20 +60,17 @@
       marker.setDraggable(true);
     }
     return google.maps.event.addListener(marker, "click", function() {
-      var bubble, framer, info;
-      info = $("<div style='width: 500px;'><br /></div>");
+      var bubble, info;
       if ("default_youtube" in listing) {
-        framer = $("<iframe src='/empty.html'><iframe>");
-        $(framer).load(function() {
-          return $(framer).contents().find("body").append(listing.default_youtube);
-        });
-        info.append(framer);
+        console.log(listing.default_youtube);
+        info = '<div id="popup"><object data="http://www.youtube.com/v/kEBXrtKO-g4" style="width: 425px; height: 350px;" type="application/x-shockwave-flash"><param value="http://www.youtube.com/v/kEBXrtKO-g4" name="movie"></object></div>';
+        ("framer = $(\"<iframe src='/empty.html' width='" + (vid_width) + "' height='400' scrollbars='no'><iframe>\")\nframer.css \n  border: \"none\"\n$(framer).load () ->\n  $(framer).contents().find(\"body\").append listing.default_youtube\n  $(framer).contents().find(\"object\").css \n    position: \"absolute\"\n    top: \"00px\"\ninfo.append framer");
       } else if ("default_image" in listing) {
         info.append("<img src=\"" + (listing.default_image) + "\" />");
       }
-      info.append("<table>\n  <tr>\n    <td width=\"70%\" valign=\"top\">\n      <h3>test " + (listing.location) + "</h3>\n      <div>" + (listing.description) + "</div>\n    <td>\n    <td width=\"30%\" valign=\"top\">\n      " + (listing.price) + " " + (listing.price_type) + "\n      <br>\n      " + (listing.size) + "\n      " + (listing.built) + " " + (listing.type) + "\n    <td>\n  </tr>\n</table>");
+      ("<table>\n  <tr>\n    <td width=\"70%\" valign=\"top\">\n      <h3>test " + (listing.location) + "</h3>\n      <div>" + (listing.description) + "</div>\n    <td>\n    <td width=\"30%\" valign=\"top\">\n      " + (listing.price) + " " + (listing.price_type) + "\n      <br>\n      " + (listing.size) + "\n      " + (listing.built) + " " + (listing.type) + "\n    <td>\n  </tr>\n</table>");
       bubble = new google.maps.InfoWindow({
-        content: info[0]
+        content: info
       });
       _.each(bubbles, function(bubble) {
         return bubble.close();
