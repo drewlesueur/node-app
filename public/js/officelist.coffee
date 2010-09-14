@@ -43,6 +43,16 @@ add_google_map_marker = (wherethe) ->
 
     else
       alert "Geocode was not successful for the following reason: " + status
+
+map_move_listener = ""
+
+move_video_when_map_moves = () ->
+  map_move_listener = google.maps.event.addListener map, 'center_changed', () ->
+    $('#current_video').css
+      top: $('#video_position').offset().top
+      left: $('#video_position').offset().left
+	
+
  
 add_search_result = (listing) ->
   marker = new google.maps.Marker
@@ -55,10 +65,16 @@ add_search_result = (listing) ->
     
     if "default_youtube" of listing
       console.log "has youtube"
+      
+      #====if webkit======
       if is_webkit()
-        vid = $ "<div class='div'></div>" 
+        vid = $ "<div id='current_video'></div>" 
         vid.append listing.default_youtube
-        $("document.body").append vid
+        vid.css position:"absolute"
+        $(document.body).append vid
+        info.append $ "<div id='video_position'>Hi</div>"
+        move_video_when_map_moves()
+        
       else
         # webkit doesn't like this
         info.append listing.default_youtube

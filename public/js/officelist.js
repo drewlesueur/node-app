@@ -1,5 +1,5 @@
 (function() {
-  var add_google_map_marker, add_search_result, bubbles, current_listing, is_webkit, map, markers, remove_markers, rpc, user, vid_height, vid_width;
+  var add_google_map_marker, add_search_result, bubbles, current_listing, is_webkit, map, map_move_listener, markers, move_video_when_map_moves, remove_markers, rpc, user, vid_height, vid_width;
   user = "";
   current_listing = "";
   bubbles = [];
@@ -53,6 +53,15 @@
       }
     });
   };
+  map_move_listener = "";
+  move_video_when_map_moves = function() {
+    return (map_move_listener = google.maps.event.addListener(map, 'center_changed', function() {
+      return $('#current_video').css({
+        top: $('#video_position').offset().top,
+        left: $('#video_position').offset().left
+      });
+    }));
+  };
   add_search_result = function(listing) {
     var marker;
     marker = new google.maps.Marker({
@@ -68,9 +77,14 @@
       if ("default_youtube" in listing) {
         console.log("has youtube");
         if (is_webkit()) {
-          vid = $("<div class='div'></div>");
+          vid = $("<div id='current_video'></div>");
           vid.append(listing.default_youtube);
-          $("document.body").append(vid);
+          vid.css({
+            position: "absolute"
+          });
+          $(document.body).append(vid);
+          info.append($("<div id='video_position'>Hi</div>"));
+          move_video_when_map_moves();
         } else {
           info.append(listing.default_youtube);
         }
