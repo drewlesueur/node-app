@@ -1,55 +1,13 @@
-<!doctype html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-<meta name="Description" content="Virtual Video Map" /> 
-<meta name="distribution" content="global" /> 
-<meta name="robots" content="INDEX" /> 
-<META name="verify-v1" content="oCEpSz9VjOD8Fyc24ldemsd4U/910skJB5XpcqR73EM=" />
-<title>Virtual Video Map</title>
-<style type="text/css">
-body {background-color: #1A1A50}
-.style1 {
-	font-family: Arial, Helvetica, sans-serif;
-	color: #FFFFFF;
-}
-a:link {
-	color: #8F8FFF;
-}
-a:visited {
-	color: #8F8FFF;
-}
-body,td,th {
-	color: #FFFFFF;
-}
-.style3 {color: #FFFFFF}
-.style4 {font-family: Arial, Helvetica, sans-serif}
-</style>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /></head>
-<body>
-<div align="center"> 
-      <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
-      <script type="text/javascript">
-//<![CDATA[
+
+<script type="text/javascript" src="/js/jquery.js"></script> 
+<script type="text/javascript" src="/js/swfobject.js"></script> 
+<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script>
 var map;
-var icon0;
-var newpoints = new Array();
- 
-function addLoadEvent(func) { 
-	var oldonload = window.onload; 
-	if (typeof window.onload != 'function'){ 
-		window.onload = func
-	} else { 
-		window.onload = function() {
-			oldonload();
-			func();
-		}
-	}
-}
- 
-addLoadEvent(loadMap);
-addLoadEvent(addPoints);
- 
-function loadMap() {
+function initialize() {
 	latlng = new google.maps.LatLng(33.4222685, -111.8226402)
     myOptions = {
       zoom: 4,
@@ -57,67 +15,28 @@ function loadMap() {
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
     map = new google.maps.Map(document.getElementById("map"),myOptions)
-}
- 
-function addPoints() {
- 
-//newpoints[0] = new Array(-73.98761183023453, 40.7487443931903, icon0, '1', '<div id="popup" style="height: 450px;"><object type="application/x-shockwave-flash" style="width:425px; height:350px;" data="http://www.youtube.com/v/4HPbrFg6_xc"><param name="movie" value="http://www.youtube.com/v/4HPbrFg6_xc" /></object></div>'); 
-newpoints[0] = new Array(-73.98761183023453, 40.7487443931903, icon0, '1', '<div jstcache="0"><div style="width: 300px;" jstcache="0"> <b dir="ltr" jstcache="0">Carving</b> <div style="margin-top: 5px;" jstcache="0"> <object height="250px" width="300px" jstcache="0"> <param value="http://www.youtube.com/v/spl8g8FJ4CE&amp;rel=0" name="movie" jstcache="0"> <param value="transparent" name="wmode" jstcache="0"> <embed height="250px" width="300px" wmode="transparent" type="application/x-shockwave-flash" src="http://www.youtube.com/v/spl8g8FJ4CE&amp;rel=0" jstcache="0"> </object> </div> <div style="margin-top: 5px;" jstcache="0"> <span style="text-align: left; float: left;" jstcache="0"> <a target="youtube" href="http://www.youtube.com" jstcache="0"> <img style="width: 44px; height: 18px; vertical-align: bottom; border: 0px none;" alt="YouTube" src="http://maps.gstatic.com/intl/en_us/mapfiles/iw_youtube.png" jstcache="0"> </a> </span> <span style="text-align: right; float: right; font-size: 0.7em;" jstcache="0"> <a target="youtube" href="http://www.youtube.com/user/steveismean" jstcache="0"> By steveismean</a> &nbsp;|&nbsp; 16 ratings&nbsp;  <img style="border: medium none; width: 55px; height: 11px; background-image: url(&quot;http://maps.gstatic.com/intl/en_us/mapfiles/iw_youtube_stars_left.png&quot;); background-position: -11px -11px;" src="http://maps.gstatic.com/intl/en_us/mapfiles/transparent.png" jstcache="0"> </span> </div> </div><div style="clear: both; float: right;" jstcache="0"><span jscontent="m.nrby.i" jstcache="24">1</span> of <span jscontent="m.nrby.n" jstcache="25">2</span> nearby results <a jsaction="lyrs.openIw" jsvalues="lyrftr:m.nrby.prev" jsdisplay="m.nrby.prev" style="outline: 0pt none; display: none;" href="javascript:void(0)" jstcache="26">« Prev</a> <a jsaction="lyrs.openIw" jsvalues="lyrftr:m.nrby.next" jsdisplay="m.nrby.next" style="outline: 0pt none;" href="javascript:void(0)" jstcache="27">Next »</a></div></div>'); 
-
-  
-	for(var i = 0; i < newpoints.length; i++) {
- 
-		//var point = new GPoint(newpoints[i][0],newpoints[i][1]);
- 
-    var point = new google.maps.LatLng(newpoints[i][1], newpoints[i][0]);
+    var point = new google.maps.LatLng(33.4222685, -111.8226402);
     var marker = new google.maps.Marker({
         position: point,
         map: map
     })
+    google.maps.event.addListener(marker, "click", function(){
+        $("body").append('<iframe id="framer" src="http://www.youtube.com/drewlesueur2" width=500 height=500></iframe>')
+        bubble = new google.maps.InfoWindow({
+         // content: '<div style="height:518px;width:520px;margin-top:10px; overflow: hidden"></div><div style="position:absolute;top:10px;left:0"><object type="application/x-shockwave-flash" style="width:300px; height:300px;" data="http://www.youtube.com/v/4HPbrFg6_xc"><param name="movie" value="http://www.youtube.com/v/4HPbrFg6_xc" /></object></div> ' 
+         
+         content: $("#framer")[0]
+        })
+        bubble.open(map, marker);
+        
+   
+    })
     
-    ;(function do_this(i) {
-      google.maps.event.addListener(marker, "click", function(){
-          bubble = new google.maps.InfoWindow({
-            content: newpoints[i][4]
-          })
-          bubble.open(map, marker)
-          
-      })
-    })(i)
     
-    
-    
-      
-		//Add overlay to map 
-		//var popuphtml = newpoints[i][4] ;
-		//var marker = createMarker(point,newpoints[i][2],popuphtml);
-		//map.addOverlay(marker);
-	}
-	
 }
- 
-function createMarker(point, icon, popuphtml) {
-	var marker = new GMarker(point, icon);
-	GEvent.addListener(marker, "click", function() {
-		marker.openInfoWindowHtml(popuphtml);
-	});
-	return marker;
-}
- 
-//]]>
-    </script>
-
-      <style type="text/css">
-div#popup {
-background:#FFFFFF;
-border:1px solid #1A1A50;
-margin:0px;
-padding:7px;
-width:425px;
-}
-    </style>
+</script>
+</head>
+<body onload="initialize();">
   <div id="map" style="width: 984px; height: 495px"></div>
-</div>
-
- </body>
- </html>
+</body>
+</html>

@@ -2,6 +2,11 @@ user = ""
 current_listing = ""
 bubbles = []
 
+
+is_webkit = () ->
+  return navigator.userAgent.match(/webkit/i)
+
+
 vid_height = 344
 vid_width = 425
 
@@ -46,41 +51,26 @@ add_search_result = (listing) ->
   if listing.user is user
     marker.setDraggable true
   google.maps.event.addListener marker, "click", () ->    
-    #info = $("<div style='width: 500px;'><br /></div>")
+    info = $("<div style='width: 500px; height: 500px;'><br /></div>")
     
     if "default_youtube" of listing
-      
-      # webkit doesn't like this, have to use iframe
-      #info.append listing.default_youtube
-      ##info.find("object").css position: "absolute"
-      
-      console.log listing.default_youtube
-      
-      info = '<div id="popup"><object data="http://www.youtube.com/v/kEBXrtKO-g4" style="width: 425px; height: 350px;" type="application/x-shockwave-flash"><param value="http://www.youtube.com/v/kEBXrtKO-g4" name="movie"></object></div>'
-      #info = '<div style="position: absolute; left: 16px; top: 16px; width: 441px; height: 371px; z-index: 10;"><div><div id="popup"><object data="http://www.youtube.com/v/kEBXrtKO-g4" style="width: 425px; height: 350px;" type="application/x-shockwave-flash"><param value="http://www.youtube.com/v/kEBXrtKO-g4" name="movie"></object></div></div></div>'
-      
-      
-      """
-      framer = $("<iframe src='/empty.html' width='#{vid_width}' height='400' scrollbars='no'><iframe>")
-      framer.css 
-        border: "none"
-      $(framer).load () ->
-        $(framer).contents().find("body").append listing.default_youtube
-        $(framer).contents().find("object").css 
-          position: "absolute"
-          top: "00px"
-      info.append framer
-      """
-      
-      
+      console.log "has youtube"
+      if is_webkit()
+        vid = $ "<div class='div'></div>" 
+        vid.append listing.default_youtube
+        $("document.body").append vid
+      else
+        # webkit doesn't like this
+        info.append listing.default_youtube
+               
+
     else if "default_image" of listing
       info.append """
       <img src="#{listing.default_image}" />
       """
     
-    #info.append("""
-    
-    ("""<table>
+    info.append("""
+    <table>
       <tr>
         <td width="70%" valign="top">
           <h3>test #{listing.location}</h3>
@@ -98,7 +88,9 @@ add_search_result = (listing) ->
     
     
     bubble = new google.maps.InfoWindow
-      content: info
+      content: info[0]
+    
+    
       
     _.each bubbles, (bubble) ->
       bubble.close()
