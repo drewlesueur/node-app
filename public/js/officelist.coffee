@@ -46,14 +46,46 @@ add_google_map_marker = (wherethe) ->
 
 map_move_listener = ""
 
+gEvent = (obj, event, func) ->
+  google.maps.event.addListener obj, event, func
+
+timeout = (time, func) ->
+  setTimeout func, time
+
+reposition_map = (helper) ->
+  console.log $('#video_position').offset().top
+  console.log $('#video_position').offset().left
+  $('#current_video').css
+    top: $('#video_position').offset().top
+    left: $('#video_position').offset().left
+
+clear_video_when_map_closes = (bubble) ->
+  google.maps.event.addListener bubble, 'closeclick', () ->
+    $("#current_video").remove()
+
+
+"""    
 move_video_when_map_moves = () ->
   map_move_listener = google.maps.event.addListener map, 'center_changed', () ->
-    $('#current_video').css
-      top: $('#video_position').offset().top
-      left: $('#video_position').offset().left
-	
+    reposition_map "center_changed"
+  map_move_listener = google.maps.event.addListener map, 'zoom_changed', () ->
+    reposition_map "zoom_changed" # not working?!
+  
+initial_position_video = (bubble) ->
+  dom_ready_listener = google.maps.event.addListener bubble, 'domready', () ->
+    #reposition_map "domready"
+  dom_ready_listener = google.maps.event.addListener bubble, 'position_changed', () ->
+    console.log "position changed"
+    reposition_map "position_changed"
+"""
 
- 
+dom_updated = false
+
+
+floating_video = () ->
+  return true
+  return is_webkit()
+  
 add_search_result = (listing) ->
   marker = new google.maps.Marker
     position: new google.maps.LatLng listing.lat, listing.lng
@@ -61,19 +93,19 @@ add_search_result = (listing) ->
   if listing.user is user
     marker.setDraggable true
   google.maps.event.addListener marker, "click", () ->    
-    info = $("<div style='width: 500px; height: 500px;'><br /></div>")
+    info = $("<div style='width: 450px; height: 500px;'><br /></div>")
     
     if "default_youtube" of listing
       console.log "has youtube"
       
       #====if webkit======
-      if is_webkit()
+      if floating_video()
         vid = $ "<div id='current_video'></div>" 
         vid.append listing.default_youtube
         vid.css position:"absolute"
         $(document.body).append vid
         info.append $ "<div id='video_position'>Hi</div>"
-        move_video_when_map_moves()
+        #move_video_when_map_moves()
         
       else
         # webkit doesn't like this
@@ -107,12 +139,31 @@ add_search_result = (listing) ->
       content: info[0]
     
     
-      
+    
     _.each bubbles, (bubble) ->
       bubble.close()
     bubbles = []
     bubbles.push bubble
+    
     bubble.open map, marker
+    
+    
+    
+    if floating_video()
+      gEvent bubble, 'closeclick', () ->
+        $('#current_video').remove()
+        google.maps.event.removeListener(center_event);
+      
+      center_event = "var"  
+      gEvent bubble, 'domready', () ->
+        timeout 500, () ->
+          reposition_map()
+          center_event = gEvent map, 'center_changed', () ->
+            reposition_map()
+      
+      
+    
+    
     if listing.user is user
       $("h3.edit_listing").click()
       $(".edit_listing [name='location']").val(listing.location)

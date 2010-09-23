@@ -1,5 +1,5 @@
 (function() {
-  var add_google_map_marker, add_search_result, bubbles, current_listing, is_webkit, map, map_move_listener, markers, move_video_when_map_moves, remove_markers, rpc, user, vid_height, vid_width;
+  var add_google_map_marker, add_search_result, bubbles, clear_video_when_map_closes, current_listing, dom_updated, floating_video, gEvent, is_webkit, map, map_move_listener, markers, remove_markers, reposition_map, rpc, timeout, user, vid_height, vid_width;
   user = "";
   current_listing = "";
   bubbles = [];
@@ -54,13 +54,30 @@
     });
   };
   map_move_listener = "";
-  move_video_when_map_moves = function() {
-    return (map_move_listener = google.maps.event.addListener(map, 'center_changed', function() {
-      return $('#current_video').css({
-        top: $('#video_position').offset().top,
-        left: $('#video_position').offset().left
-      });
-    }));
+  gEvent = function(obj, event, func) {
+    return google.maps.event.addListener(obj, event, func);
+  };
+  timeout = function(time, func) {
+    return setTimeout(func, time);
+  };
+  reposition_map = function(helper) {
+    console.log($('#video_position').offset().top);
+    console.log($('#video_position').offset().left);
+    return $('#current_video').css({
+      top: $('#video_position').offset().top,
+      left: $('#video_position').offset().left
+    });
+  };
+  clear_video_when_map_closes = function(bubble) {
+    return google.maps.event.addListener(bubble, 'closeclick', function() {
+      return $("#current_video").remove();
+    });
+  };
+  "  \nmove_video_when_map_moves = () ->\nmap_move_listener = google.maps.event.addListener map, 'center_changed', () ->\n  reposition_map \"center_changed\"\nmap_move_listener = google.maps.event.addListener map, 'zoom_changed', () ->\n  reposition_map \"zoom_changed\" # not working?!\n\ninitial_position_video = (bubble) ->\ndom_ready_listener = google.maps.event.addListener bubble, 'domready', () ->\n  #reposition_map \"domready\"\ndom_ready_listener = google.maps.event.addListener bubble, 'position_changed', () ->\n  console.log \"position changed\"\n  reposition_map \"position_changed\"";
+  dom_updated = false;
+  floating_video = function() {
+    return true;
+    return is_webkit();
   };
   add_search_result = function(listing) {
     var marker;
@@ -72,11 +89,11 @@
       marker.setDraggable(true);
     }
     return google.maps.event.addListener(marker, "click", function() {
-      var bubble, info, vid;
+      var bubble, center_event, info, vid;
       info = $("<div style='width: 500px; height: 500px;'><br /></div>");
       if ("default_youtube" in listing) {
         console.log("has youtube");
-        if (is_webkit()) {
+        if (floating_video()) {
           vid = $("<div id='current_video'></div>");
           vid.append(listing.default_youtube);
           vid.css({
@@ -84,7 +101,6 @@
           });
           $(document.body).append(vid);
           info.append($("<div id='video_position'>Hi</div>"));
-          move_video_when_map_moves();
         } else {
           info.append(listing.default_youtube);
         }
@@ -101,6 +117,21 @@
       bubbles = [];
       bubbles.push(bubble);
       bubble.open(map, marker);
+      if (floating_video()) {
+        gEvent(bubble, 'closeclick', function() {
+          $('#current_video').remove();
+          return google.maps.event.removeListener(center_event);
+        });
+        center_event = "var";
+        gEvent(bubble, 'domready', function() {
+          return timeout(500, function() {
+            reposition_map();
+            return (center_event = gEvent(map, 'center_changed', function() {
+              return reposition_map();
+            }));
+          });
+        });
+      }
       if (listing.user === user) {
         $("h3.edit_listing").click();
         $(".edit_listing [name='location']").val(listing.location);
