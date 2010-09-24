@@ -66,7 +66,7 @@
   reposition_map = function(helper) {
     try {
       return $('#current_video').css({
-        top: $('#video_position').offset().top - 20,
+        top: $('#video_position').offset().top - 10,
         left: $('#video_position').offset().left
       });
     } catch (e) {
@@ -96,6 +96,11 @@
     return google.maps.event.addListener(marker, "click", function() {
       var bubble, center_event, info, the_interval, vid;
       info = $("<div style='width: 450px; height: 475px;'><br /></div>");
+      rpc("get_listing_images", {
+        id: listing.id
+      }, function(data) {
+        return console.log(data);
+      });
       if ("default_youtube" in listing) {
         console.log("has youtube");
         if (floating_video()) {

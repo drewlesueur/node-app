@@ -60,7 +60,7 @@ reposition_map = (helper) ->
     #console.log $('#video_position').offset().top
     #console.log $('#video_position').offset().left
     $('#current_video').css
-      top: $('#video_position').offset().top - 20
+      top: $('#video_position').offset().top - 10
       left: $('#video_position').offset().left
   catch e
     "just skip it"
@@ -101,6 +101,9 @@ add_search_result = (listing) ->
   google.maps.event.addListener marker, "click", () ->    
     info = $("<div style='width: 450px; height: 475px;'><br /></div>")
     
+    rpc "get_listing_images", {id: listing.id}, (data) ->
+      console.log data
+      
     if "default_youtube" of listing
       console.log "has youtube"
       

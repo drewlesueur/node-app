@@ -84,7 +84,6 @@ this.methods =
         error: error
 
   get_listing_images: (req, res) ->
-    
     images = false
     youtubes = false
     
