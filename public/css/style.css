@@ -45,3 +45,7 @@ td.main {
   width: 425px;
   height: 350px;
 }
+
+a {
+text-decoration: none;
+}

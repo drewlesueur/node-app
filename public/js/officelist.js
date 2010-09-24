@@ -1,5 +1,5 @@
 (function() {
-  var add_google_map_marker, add_search_result, bubbles, clear_video_when_map_closes, current_listing, dom_updated, floating_video, gEvent, is_webkit, map, map_move_listener, markers, remove_markers, reposition_map, rpc, timeout, user, vid_height, vid_width;
+  var add_google_map_marker, add_search_result, bubbles, clear_video_when_map_closes, current_listing, dom_updated, floating_video, gEvent, interval, is_webkit, map, map_move_listener, markers, remove_markers, reposition_map, rpc, timeout, user, vid_height, vid_width;
   user = "";
   current_listing = "";
   bubbles = [];
@@ -60,13 +60,18 @@
   timeout = function(time, func) {
     return setTimeout(func, time);
   };
+  interval = function(time, func) {
+    return setInterval(func, time);
+  };
   reposition_map = function(helper) {
-    console.log($('#video_position').offset().top);
-    console.log($('#video_position').offset().left);
-    return $('#current_video').css({
-      top: $('#video_position').offset().top,
-      left: $('#video_position').offset().left
-    });
+    try {
+      return $('#current_video').css({
+        top: $('#video_position').offset().top - 20,
+        left: $('#video_position').offset().left
+      });
+    } catch (e) {
+      return "just skip it";
+    }
   };
   clear_video_when_map_closes = function(bubble) {
     return google.maps.event.addListener(bubble, 'closeclick', function() {
@@ -89,8 +94,8 @@
       marker.setDraggable(true);
     }
     return google.maps.event.addListener(marker, "click", function() {
-      var bubble, center_event, info, vid;
-      info = $("<div style='width: 500px; height: 500px;'><br /></div>");
+      var bubble, center_event, info, the_interval, vid;
+      info = $("<div style='width: 450px; height: 475px;'><br /></div>");
       if ("default_youtube" in listing) {
         console.log("has youtube");
         if (floating_video()) {
@@ -100,14 +105,32 @@
             position: "absolute"
           });
           $(document.body).append(vid);
-          info.append($("<div id='video_position'>Hi</div>"));
+          info.append($("<div id='video_position'>&nbsp;</div>"));
         } else {
           info.append(listing.default_youtube);
         }
       } else if ("default_image" in listing) {
         info.append("<img src=\"" + (listing.default_image) + "\" />");
       }
-      info.append("<table>\n  <tr>\n    <td width=\"70%\" valign=\"top\">\n      <h3>test " + (listing.location) + "</h3>\n      <div>" + (listing.description) + "</div>\n    <td>\n    <td width=\"30%\" valign=\"top\">\n      " + (listing.price) + " " + (listing.price_type) + "\n      <br>\n      " + (listing.size) + "\n      " + (listing.built) + " " + (listing.type) + "\n    <td>\n  </tr>\n</table>");
+      info.append("<table style=\"border-collapse: collapse;\">\n  <tr>\n    <td height=\"330\">\n    </td>\n  </tr>\n  <tr>\n    <td width=\"70%\" valign=\"top\">\n      <h3>test " + (listing.location) + "</h3>\n      <div>" + (listing.description) + "</div>\n    <td>\n    <td width=\"30%\" valign=\"top\">\n      " + (listing.price) + " " + (listing.price_type) + "\n      <br>\n      " + (listing.size) + "\n      " + (listing.built) + " " + (listing.type) + "\n    <td>\n  </tr>\n  <tr>\n    <td colspan=\"2\" >\n      <div id=\"more_links\" style=\"position: absolute;\">\n        <a href=\"#\" id=\"contact\">Contact</a>\n        <a href=\"#\" id=\"more\">More&#x25bc;</a>\n      </div>\n    </td>\n  </tr>\n</table>");
+      info.find("#more").click(function(e) {
+        var extra_box;
+        if ($("#extra_box").length > 0) {
+          $("#extra_box").remove();
+          return null;
+        }
+        e.preventDefault();
+        extra_box = $('<div id="extra_box"> hellow wolrld</div>');
+        extra_box.css({
+          position: 'abosolute',
+          border: '1px solid black',
+          width: 100,
+          height: 50,
+          "background-color": 'white'
+        });
+        extra_box.text("Video");
+        return $("#more_links").append(extra_box);
+      });
       bubble = new google.maps.InfoWindow({
         content: info[0]
       });
@@ -117,18 +140,24 @@
       bubbles = [];
       bubbles.push(bubble);
       bubble.open(map, marker);
+      the_interval = "";
       if (floating_video()) {
         gEvent(bubble, 'closeclick', function() {
           $('#current_video').remove();
-          return google.maps.event.removeListener(center_event);
+          google.maps.event.removeListener(center_event);
+          return clearInterval(the_interval);
         });
         center_event = "var";
         gEvent(bubble, 'domready', function() {
-          return timeout(500, function() {
+          timeout(500, function() {
+            return reposition_map();
+          });
+          return timeout(1000, function() {
             reposition_map();
-            return (center_event = gEvent(map, 'center_changed', function() {
+            interval(1000, function() {
               return reposition_map();
-            }));
+            });
+            return (center_event = gEvent(map, 'center_changed', reposition_map));
           });
         });
       }
@@ -148,7 +177,7 @@
     });
   };
   $(document).ready(function() {
-    var add_image_count, add_youtube_count, button, initialize, interval, the_height;
+    var add_image_count, add_youtube_count, button, initialize, the_height;
     user = $("#user").attr("data-officelist-user");
     initialize = function() {
       var latlng, myOptions;
@@ -254,7 +283,6 @@
     });
     $(".multi").MultiFile();
     button = $("#add_upload");
-    interval = 0;
     add_image_count = 0;
     add_youtube_count = 0;
     new AjaxUpload(button, {
@@ -272,7 +300,6 @@
         $("#add_form").append(input);
         add_image_count += 1;
         button.text("Add Another");
-        window.clearInterval(interval);
         this.enable();
         return $('<img style="display: block; margin: 3px;">').appendTo('#add_files_list').attr("src", "/images/thumbs/" + (response));
       }

@@ -52,12 +52,18 @@ gEvent = (obj, event, func) ->
 timeout = (time, func) ->
   setTimeout func, time
 
+interval = (time, func) ->
+  setInterval func, time
+
 reposition_map = (helper) ->
-  console.log $('#video_position').offset().top
-  console.log $('#video_position').offset().left
-  $('#current_video').css
-    top: $('#video_position').offset().top
-    left: $('#video_position').offset().left
+  try
+    #console.log $('#video_position').offset().top
+    #console.log $('#video_position').offset().left
+    $('#current_video').css
+      top: $('#video_position').offset().top - 20
+      left: $('#video_position').offset().left
+  catch e
+    "just skip it"
 
 clear_video_when_map_closes = (bubble) ->
   google.maps.event.addListener bubble, 'closeclick', () ->
@@ -93,7 +99,7 @@ add_search_result = (listing) ->
   if listing.user is user
     marker.setDraggable true
   google.maps.event.addListener marker, "click", () ->    
-    info = $("<div style='width: 450px; height: 500px;'><br /></div>")
+    info = $("<div style='width: 450px; height: 475px;'><br /></div>")
     
     if "default_youtube" of listing
       console.log "has youtube"
@@ -104,7 +110,7 @@ add_search_result = (listing) ->
         vid.append listing.default_youtube
         vid.css position:"absolute"
         $(document.body).append vid
-        info.append $ "<div id='video_position'>Hi</div>"
+        info.append $ "<div id='video_position'>&nbsp;</div>"
         #move_video_when_map_moves()
         
       else
@@ -117,8 +123,13 @@ add_search_result = (listing) ->
       <img src="#{listing.default_image}" />
       """
     
+    
     info.append("""
-    <table>
+    <table style="border-collapse: collapse;">
+      <tr>
+        <td height="330">
+        </td>
+      </tr>
       <tr>
         <td width="70%" valign="top">
           <h3>test #{listing.location}</h3>
@@ -131,10 +142,37 @@ add_search_result = (listing) ->
           #{listing.built} #{listing.type}
         <td>
       </tr>
+      <tr>
+        <td colspan="2" >
+          <div id="more_links" style="position: absolute;">
+            <a href="#" id="contact">Contact</a>
+            <a href="#" id="more">More&#x25bc;</a>
+          </div>
+        </td>
+      </tr>
     </table>
     """)
     
-    
+    info.find("#more").click (e) ->
+      if $("#extra_box").length > 0
+        $("#extra_box").remove()
+        return
+        
+      e.preventDefault()
+      extra_box = $ '<div id="extra_box"> hellow wolrld</div>'
+      extra_box.css
+        position: 'abosolute'
+        border: '1px solid black'
+        width: 100
+        height: 50
+        "background-color": 'white'
+      extra_box.text """
+      Video
+      """
+      $("#more_links").append extra_box
+        
+      
+      
     bubble = new google.maps.InfoWindow
       content: info[0]
     
@@ -148,19 +186,23 @@ add_search_result = (listing) ->
     bubble.open map, marker
     
     
+    the_interval = ""
     
     if floating_video()
       gEvent bubble, 'closeclick', () ->
         $('#current_video').remove()
         google.maps.event.removeListener(center_event);
-      
+        clearInterval the_interval
       center_event = "var"  
       gEvent bubble, 'domready', () ->
         timeout 500, () ->
           reposition_map()
-          center_event = gEvent map, 'center_changed', () ->
+        timeout 1000, () -> #just in case slower in other browsers
+          reposition_map()
+          interval 1000, () ->
             reposition_map()
-      
+          center_event = gEvent map, 'center_changed', reposition_map
+          
       
     
     
@@ -263,7 +305,7 @@ $(document).ready () ->
   $(".multi").MultiFile()
   
   button = $("#add_upload")
-  interval = 0;
+  #the_interval = 0;
   add_image_count = 0
   add_youtube_count = 0
   
@@ -280,7 +322,7 @@ $(document).ready () ->
       $("#add_form").append input
       add_image_count += 1
       button.text "Add Another"
-      window.clearInterval interval
+      #window.clearInterval the_interval
       this.enable()
       $('<img style="display: block; margin: 3px;">').appendTo('#add_files_list').attr "src", "/images/thumbs/#{response}"
         
